@@ -15,13 +15,29 @@ const getSeriesById = async (id) => {
 };
 
 const createNewSeries = async (body) => {
-  const SQLQuery = `INSERT INTO series(id_genre, series_title, series_subtitle, series_desc, series_year, series_classification, series_producer, series_cast, series_image, series_duration, amount_episode, series_rating, series_ongoing) VALUES('${body.id_genre}','${body.series_title}', '${body.series_subtitle}', '${body.series_desc}', ${body.series_year}, '${body.series_classification}', '${body.series_producer}', '${body.series_cast}', '${body.series_image}', '${body.series_duration}', '${body.amount_episode}', '${body.series_rating}', '${body.series_ongoing}')`;
+  const SQLQuery = `INSERT INTO series(id_genre, series_title, series_subtitle, series_desc, series_year, series_classification, series_producer, series_cast, series_image, series_duration, amount_episode, series_rating, series_ongoing) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  const [result] = await dbPool.execute(SQLQuery);
+  const values = [
+    body.id_genre,
+    body.series_title,
+    body.series_subtitle,
+    body.series_desc,
+    body.series_year,
+    body.series_classification,
+    body.series_producer,
+    body.series_cast,
+    body.series_image,
+    body.series_duration,
+    body.amount_episode,
+    body.series_rating,
+    body.series_ongoing,
+  ];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
   return result;
 };
 
-const createBulkSeries = async (body) => {
+const createNewBulkSeries = async (body) => {
   if (!Array.isArray(body)) {
     throw new Error('Input must be an array');
   }
@@ -63,10 +79,63 @@ const createBulkSeries = async (body) => {
   return result;
 };
 
-const updateSeries = async (body, id) => {
-  const SQLQuery = `UPDATE series SET id_genre='${body.id_genre}', series_title='${body.series_title}', series_subtitle='${body.series_subtitle}', series_desc='${body.series_desc}', series_year=${body.series_year}, series_classification='${body.series_classification}', series_producer='${body.series_producer}', series_cast='${body.series_cast}', series_image='${body.series_image}', series_duration='${body.series_duration}', amount_episode='${body.amount_episode}', series_rating='${body.series_rating}', series_ongoing='${body.series_ongoing}' WHERE id_series=${id}`;
+const updateSeriesAll = async (body, id) => {
+  const SQLQuery = `
+    UPDATE series SET
+      id_genre = ?,
+      series_title = ?,
+      series_subtitle = ?,
+      series_desc = ?,
+      series_year = ?,
+      series_classification = ?,
+      series_producer = ?,
+      series_cast = ?,
+      series_image = ?,
+      series_duration = ?,
+      amount_episode = ?,
+      series_rating = ?,
+      series_ongoing = ?
+    WHERE id_series = ?
+  `;
 
-  const [result] = await dbPool.execute(SQLQuery);
+  const values = [
+    body.id_genre,
+    body.series_title,
+    body.series_subtitle,
+    body.series_desc,
+    body.series_year,
+    body.series_classification,
+    body.series_producer,
+    body.series_cast,
+    body.series_image,
+    body.series_duration,
+    body.amount_episode,
+    body.series_rating,
+    body.series_ongoing,
+    id,
+  ];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
+  return result;
+};
+
+const updateSeriesPartial = async (body, id) => {
+  // get key and value from body
+  const fields = Object.keys(body);
+  const values = Object.values(body);
+
+  // map set query from fields
+  const setQuery = fields.map((field) => `${field} = ?`).join(', ');
+
+  const SQLQuery = `
+    UPDATE series
+    SET ${setQuery}
+    WHERE id_series = ?
+  `;
+
+  const params = [...values, id];
+
+  const [result] = await dbPool.execute(SQLQuery, params);
   return result;
 };
 
@@ -82,4 +151,4 @@ const deleteSeriesById = async (id) => {
   return result;
 };
 
-export const SeriesModel = { getAllSeries, getSeriesById, createNewSeries, createBulkSeries, updateSeries, deleteAllSeries, deleteSeriesById };
+export const SeriesModel = { getAllSeries, getSeriesById, createNewSeries, createNewBulkSeries, updateSeriesAll, updateSeriesPartial, deleteAllSeries, deleteSeriesById };

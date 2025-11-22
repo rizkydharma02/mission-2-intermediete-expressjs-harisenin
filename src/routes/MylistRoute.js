@@ -13,7 +13,10 @@ router.get('/', MylistController.getAllMylist);
 router.get('/:id', MylistController.getMylistById);
 
 // Update - Patch Mylist Endpoint
-router.patch('/:id', MylistController.updateMylist);
+router.patch('/:id', MylistController.updateMylistPartial);
+
+// Update - Put Mylist Endpoint
+router.put('/:id', MylistController.updateMylistAll);
 
 // Delete - Delete All Mylist Endpoint
 router.delete('/', MylistController.deleteAllMylist);

@@ -63,7 +63,32 @@ const createNewGenre = async (req, res) => {
   }
 };
 
-const updateGenre = async (req, res) => {
+const createNewBulkGenre = async (req, res) => {
+  const { body } = req;
+
+  if (!Array.isArray(body)) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required genre array or using array instead of object',
+      data: null,
+    });
+  }
+
+  try {
+    const result = await GenreModel.createNewBulkGenre(body);
+
+    res.status(201).json({
+      message: 'Bulk insert movie success',
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updateGenreAll = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
@@ -75,7 +100,35 @@ const updateGenre = async (req, res) => {
   }
 
   try {
-    await GenreModel.updateGenre(body, id);
+    await GenreModel.updateGenreAll(body, id);
+    res.status(200).json({
+      message: 'Successfully updated genre by id',
+      data: {
+        id: id,
+        ...body,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updateGenrePartial = async (req, res) => {
+  const { id } = req.params;
+  const { body } = req;
+
+  if (!id) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required genre id',
+      data: null,
+    });
+  }
+
+  try {
+    await GenreModel.updateGenrePartial(body, id);
     res.status(200).json({
       message: 'Successfully updated genre by id',
       data: {
@@ -134,7 +187,9 @@ export const GenreController = {
   getAllGenre,
   getGenreById,
   createNewGenre,
-  updateGenre,
+  createNewBulkGenre,
+  updateGenreAll,
+  updateGenrePartial,
   deleteAllGenre,
   deleteGenreById,
 };

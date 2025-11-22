@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/', SeriesController.createNewSeries);
 
 // Create - Post Bulk Series Endpoint
-router.post('/bulk', SeriesController.createBulkSeries);
+router.post('/bulk', SeriesController.createNewBulkSeries);
 
 // Read - Get All Series Endpoint
 router.get('/', SeriesController.getAllSeries);
@@ -16,7 +16,10 @@ router.get('/', SeriesController.getAllSeries);
 router.get('/:id', SeriesController.getSeriesById);
 
 // Update - Patch Series Endpoint
-router.patch('/:id', SeriesController.updateSeries);
+router.patch('/:id', SeriesController.updateSeriesPartial);
+
+// Update - Put Series Endpoint
+router.put('/:id', SeriesController.updateSeriesAll);
 
 // Delete - Delete All Series Endpoint
 router.delete('/', SeriesController.deleteAllSeries);

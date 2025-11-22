@@ -74,7 +74,7 @@ const createNewSeries = async (req, res) => {
   }
 };
 
-const createBulkSeries = async (req, res) => {
+const createNewBulkSeries = async (req, res) => {
   const { body } = req;
 
   if (!Array.isArray(body)) {
@@ -85,7 +85,7 @@ const createBulkSeries = async (req, res) => {
   }
 
   try {
-    const result = await SeriesModel.createBulkSeries(body);
+    const result = await SeriesModel.createNewBulkSeries(body);
 
     res.status(201).json({
       message: 'Bulk insert series success',
@@ -99,7 +99,7 @@ const createBulkSeries = async (req, res) => {
   }
 };
 
-const updateSeries = async (req, res) => {
+const updateSeriesAll = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
@@ -111,7 +111,35 @@ const updateSeries = async (req, res) => {
   }
 
   try {
-    await SeriesModel.updateSeries(body, id);
+    await SeriesModel.updateSeriesAll(body, id);
+    res.status(200).json({
+      message: 'Successfully updated series by id',
+      data: {
+        id: id,
+        ...body,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updateSeriesPartial = async (req, res) => {
+  const { id } = req.params;
+  const { body } = req;
+
+  if (!id) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required series id',
+      data: null,
+    });
+  }
+
+  try {
+    await SeriesModel.updateSeriesPartial(body, id);
     res.status(200).json({
       message: 'Successfully updated series by id',
       data: {
@@ -166,4 +194,4 @@ const deleteSeriesById = async (req, res) => {
   }
 };
 
-export const SeriesController = { getAllSeries, getSeriesById, createNewSeries, createBulkSeries, updateSeries, deleteAllSeries, deleteSeriesById };
+export const SeriesController = { getAllSeries, getSeriesById, createNewSeries, createNewBulkSeries, updateSeriesAll, updateSeriesPartial, deleteAllSeries, deleteSeriesById };

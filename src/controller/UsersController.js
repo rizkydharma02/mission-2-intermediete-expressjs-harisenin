@@ -64,7 +64,32 @@ const createNewUser = async (req, res) => {
   }
 };
 
-const updateUser = async (req, res) => {
+const createNewBulkUser = async (req, res) => {
+  const { body } = req;
+
+  if (!Array.isArray(body)) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required user array or using array instead of object',
+      data: null,
+    });
+  }
+
+  try {
+    const result = await UsersModel.createNewBulkUser(body);
+
+    res.status(201).json({
+      message: 'Bulk insert movie success',
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updateUserAll = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
@@ -76,7 +101,35 @@ const updateUser = async (req, res) => {
   }
 
   try {
-    await UsersModel.updateUser(body, id);
+    await UsersModel.updateUserAll(body, id);
+    res.status(200).json({
+      message: 'Successfully updated user by id',
+      data: {
+        id: id,
+        ...body,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updateUserPartial = async (req, res) => {
+  const { id } = req.params;
+  const { body } = req;
+
+  if (!id) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required user id',
+      data: null,
+    });
+  }
+
+  try {
+    await UsersModel.updateUserPartial(body, id);
     res.status(200).json({
       message: 'Successfully updated user by id',
       data: {
@@ -131,4 +184,4 @@ const deleteUserById = async (req, res) => {
   }
 };
 
-export const UsersController = { getAllUser, getUserById, createNewUser, updateUser, deleteAllUser, deleteUserById };
+export const UsersController = { getAllUser, getUserById, createNewUser, createNewBulkUser, updateUserAll, updateUserPartial, deleteAllUser, deleteUserById };

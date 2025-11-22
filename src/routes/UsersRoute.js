@@ -13,7 +13,10 @@ router.get('/', UsersController.getAllUser);
 router.get('/:id', UsersController.getUserById);
 
 // Update - Patch Users Endpoint
-router.patch('/:id', UsersController.updateUser);
+router.patch('/:id', UsersController.updateUserPartial);
+
+// Update - Put Users Endpoint
+router.put('/:id', UsersController.updateUserAll);
 
 // Delete - Delete All Users Endpoint
 router.delete('/', UsersController.deleteAllUser);

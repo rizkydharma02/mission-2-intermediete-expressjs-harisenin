@@ -13,7 +13,10 @@ router.get('/', PaymentsController.getAllPayment);
 router.get('/:id', PaymentsController.getPaymentById);
 
 // Update - Patch Payments Endpoint
-router.patch('/:id', PaymentsController.updatePayment);
+router.patch('/:id', PaymentsController.updatePaymentPartial);
+
+// Update - Put Payments Endpoint
+router.put('/:id', PaymentsController.updatePaymentAll);
 
 // Delete - Delete All Payments Endpoint
 router.delete('/', PaymentsController.deleteAllPayment);

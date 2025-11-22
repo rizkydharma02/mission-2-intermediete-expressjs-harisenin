@@ -13,7 +13,10 @@ router.get('/', OrdersController.getAllOrder);
 router.get('/:id', OrdersController.getOrderById);
 
 // Update - Patch Orders Endpoint
-router.patch('/:id', OrdersController.updateOrder);
+router.patch('/:id', OrdersController.updateOrderPartial);
+
+// Update - Put Orders Endpoint
+router.put('/:id', OrdersController.updateOrderAll);
 
 // Delete - Delete All Orders Endpoint
 router.delete('/', OrdersController.deleteAllOrder);

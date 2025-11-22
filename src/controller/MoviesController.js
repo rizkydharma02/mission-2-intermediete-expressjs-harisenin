@@ -63,7 +63,7 @@ const createNewMovie = async (req, res) => {
   }
 };
 
-const createBulkMovies = async (req, res) => {
+const createNewBulkMovies = async (req, res) => {
   const { body } = req;
 
   if (!Array.isArray(body)) {
@@ -74,7 +74,7 @@ const createBulkMovies = async (req, res) => {
   }
 
   try {
-    const result = await MoviesModel.createBulkMovies(body);
+    const result = await MoviesModel.createNewBulkMovies(body);
 
     res.status(201).json({
       message: 'Bulk insert movie success',
@@ -88,11 +88,11 @@ const createBulkMovies = async (req, res) => {
   }
 };
 
-const updateMovie = async (req, res) => {
+const updateMovieAll = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
-  if (!id) {
+  if (!id || !body) {
     return res.status(400).json({
       message: 'Bad Request: Missing required movie id',
       data: null,
@@ -100,7 +100,35 @@ const updateMovie = async (req, res) => {
   }
 
   try {
-    await MoviesModel.updateMovie(body, id);
+    await MoviesModel.updateMovieAll(body, id);
+    res.status(200).json({
+      message: 'Successfully updated movie by id',
+      data: {
+        id: id,
+        ...body,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updateMoviePartial = async (req, res) => {
+  const { id } = req.params;
+  const { body } = req;
+
+  if (!id || !body) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required movie id',
+      data: null,
+    });
+  }
+
+  try {
+    await MoviesModel.updateMoviePartial(body, id);
     res.status(200).json({
       message: 'Successfully updated movie by id',
       data: {
@@ -155,4 +183,4 @@ const deleteMovieById = async (req, res) => {
   }
 };
 
-export const MoviesController = { getAllMovie, getMovieById, createNewMovie, createBulkMovies, updateMovie, deleteAllMovie, deleteMovieById };
+export const MoviesController = { getAllMovie, getMovieById, createNewMovie, createNewBulkMovies, updateMovieAll, updateMoviePartial, deleteAllMovie, deleteMovieById };

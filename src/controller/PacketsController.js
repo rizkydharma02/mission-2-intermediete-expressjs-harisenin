@@ -63,7 +63,32 @@ const createNewPacket = async (req, res) => {
   }
 };
 
-const updatePacket = async (req, res) => {
+const createNewBulkPacket = async (req, res) => {
+  const { body } = req;
+
+  if (!Array.isArray(body)) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required packet array or using array instead of object',
+      data: null,
+    });
+  }
+
+  try {
+    const result = await PacketsModel.createNewBulkPacket(body);
+
+    res.status(201).json({
+      message: 'Bulk insert movie success',
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updatePacketAll = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
@@ -75,7 +100,35 @@ const updatePacket = async (req, res) => {
   }
 
   try {
-    await PacketsModel.updatePacket(body, id);
+    await PacketsModel.updatePacketAll(body, id);
+    res.status(200).json({
+      message: 'Successfully updated packet by id',
+      data: {
+        id: id,
+        ...body,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updatePacketPartial = async (req, res) => {
+  const { id } = req.params;
+  const { body } = req;
+
+  if (!id) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required packet id',
+      data: null,
+    });
+  }
+
+  try {
+    await PacketsModel.updatePacketPartial(body, id);
     res.status(200).json({
       message: 'Successfully updated packet by id',
       data: {
@@ -130,4 +183,4 @@ const deletePacketById = async (req, res) => {
   }
 };
 
-export const PacketsController = { getAllPacket, getPacketById, createNewPacket, updatePacket, deleteAllPacket, deletePacketById };
+export const PacketsController = { getAllPacket, getPacketById, createNewPacket, createNewBulkPacket, updatePacketAll, updatePacketPartial, deleteAllPacket, deletePacketById };

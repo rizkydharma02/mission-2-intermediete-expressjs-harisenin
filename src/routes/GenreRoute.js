@@ -13,7 +13,10 @@ router.get('/', GenreController.getAllGenre);
 router.get('/:id', GenreController.getGenreById);
 
 // Update - Patch Genre Endpoint
-router.patch('/:id', GenreController.updateGenre);
+router.patch('/:id', GenreController.updateGenrePartial);
+
+// Update - Put Genre Endpoint
+router.put('/:id', GenreController.updateGenreAll);
 
 // Delete - Delete All Genre Endpoint
 router.delete('/', GenreController.deleteAllGenre);

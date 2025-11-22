@@ -17,6 +17,15 @@
 - cors
 - mysql2
 
+## Http Method
+
+- PATCH by id
+- PUT by id
+- POST Bulk
+- POST
+- DELETE by Id
+- DELETE All
+
 ## Endpoint Access
 
 - /movies
@@ -27,3 +36,5 @@
 - /orders
 - /packets
 - /users
+
+### notes: use endpoint /bulk to post a lot data json

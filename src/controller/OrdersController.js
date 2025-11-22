@@ -63,7 +63,32 @@ const createNewOrder = async (req, res) => {
   }
 };
 
-const updateOrder = async (req, res) => {
+const createNewBulkOrder = async (req, res) => {
+  const { body } = req;
+
+  if (!Array.isArray(body)) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required order array or using array instead of object',
+      data: null,
+    });
+  }
+
+  try {
+    const result = await OrdersModel.createNewBulkOrder(body);
+
+    res.status(201).json({
+      message: 'Bulk insert movie success',
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updateOrderAll = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
@@ -75,7 +100,35 @@ const updateOrder = async (req, res) => {
   }
 
   try {
-    await OrdersModel.updateOrder(body, id);
+    await OrdersModel.updateOrderAll(body, id);
+    res.status(200).json({
+      message: 'Successfully updated order by id',
+      data: {
+        id: id,
+        ...body,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+const updateOrderPartial = async (req, res) => {
+  const { id } = req.params;
+  const { body } = req;
+
+  if (!id) {
+    return res.status(400).json({
+      message: 'Bad Request: Missing required order id',
+      data: null,
+    });
+  }
+
+  try {
+    await OrdersModel.updateOrderPartial(body, id);
     res.status(200).json({
       message: 'Successfully updated order by id',
       data: {
@@ -130,4 +183,4 @@ const deleteOrderById = async (req, res) => {
   }
 };
 
-export const OrdersController = { getAllOrder, getOrderById, createNewOrder, updateOrder, deleteAllOrder, deleteOrderById };
+export const OrdersController = { getAllOrder, getOrderById, createNewOrder, createNewBulkOrder, updateOrderAll, updateOrderPartial, deleteAllOrder, deleteOrderById };

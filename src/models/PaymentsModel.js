@@ -13,14 +13,54 @@ const getPaymentById = async (id) => {
 };
 
 const createNewPayment = async (body) => {
-  const SQLQuery = `INSERT INTO payments(id_packet, payment_price, code_voucher, payment_method, payment_status) VALUES('${body.id_packet}', '${body.payment_price}', '${body.code_voucher}', '${body.payment_method}', '${body.payment_status}')`;
-  const [result] = await dbPool.execute(SQLQuery);
+  const SQLQuery = `INSERT INTO payments(id_packet, payment_price, code_voucher, payment_method, payment_status) VALUES( ?, ?, ?, ?, ?)`;
+
+  const values = [body.id_packet, body.payment_price, body.code_voucher, body.payment_method, body.payment_status];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
   return result;
 };
 
-const updatePayment = async (body, id) => {
-  const SQLQuery = `UPDATE payments SET id_packet='${body.id_packet}', payment_price='${body.payment_price}', code_voucher='${body.code_voucher}', payment_method='${body.payment_method}', payment_status='${body.payment_status}' WHERE id_payment=${id}`;
-  const [result] = await dbPool.execute(SQLQuery);
+const createNewBulkPayment = async (body) => {
+  if (!Array.isArray(body)) {
+    throw new Error('Input must be an array');
+  }
+
+  const values = body.map((item) => [item.id_packet, item.payment_price, item.code_voucher, item.payment_method, item.payment_status]);
+
+  // single placeholder for bulk insert on nested array
+  const SQLQuery = `INSERT INTO payments(id_packet, payment_price, code_voucher, payment_method, payment_status) VALUES ?)`;
+
+  const [result] = await dbPool.query(SQLQuery, [values]);
+  return result;
+};
+
+const updatePaymentAll = async (body, id) => {
+  const SQLQuery = `UPDATE payments SET id_packet=?, payment_price=?, code_voucher=?, payment_method=?, payment_status=? WHERE id_payment=?`;
+
+  const values = [body.id_packet, body.payment_price, body.code_voucher, body.payment_method, body.payment_status, id];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
+  return result;
+};
+
+const updatePaymentPartial = async (body, id) => {
+  // get key and value from body
+  const fields = Object.keys(body);
+  const values = Object.values(body);
+
+  // map set query from fields
+  const setQuery = fields.map((field) => `${field} = ?`).join(', ');
+
+  const SQLQuery = `
+    UPDATE payments
+    SET ${setQuery}
+    WHERE id_payment = ?
+  `;
+
+  const params = [...values, id];
+
+  const [result] = await dbPool.execute(SQLQuery, params);
   return result;
 };
 
@@ -36,4 +76,4 @@ const deletePaymentById = async (id) => {
   return result;
 };
 
-export const PaymentsModel = { getAllPayment, getPaymentById, createNewPayment, updatePayment, deleteAllPayment, deletePaymentById };
+export const PaymentsModel = { getAllPayment, getPaymentById, createNewPayment, createNewBulkPayment, updatePaymentAll, updatePaymentPartial, deleteAllPayment, deletePaymentById };

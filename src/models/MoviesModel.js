@@ -13,13 +13,27 @@ const getMovieById = async (id) => {
 };
 
 const createNewMovie = async (body) => {
-  const SQLQuery = `INSERT INTO movies(id_genre, movie_title, movie_subtitle, movie_year, movie_classification, movie_producer, movie_cast, movie_image, movie_duration, movie_rating, movie_ongoing) VALUES('${body.id_genre}','${body.movie_title}', '${body.movie_subtitle}', ${body.movie_year}, '${body.movie_classification}', '${body.movie_producer}', '${body.movie_cast}', '${body.movie_image}', '${body.movie_duration}', '${body.movie_rating}', '${body.movie_ongoing}')`;
+  const SQLQuery = `INSERT INTO movies (
+      id_genre,
+      movie_title,
+      movie_subtitle,
+      movie_year,
+      movie_classification,
+      movie_producer,
+      movie_cast,
+      movie_image,
+      movie_duration,
+      movie_rating,
+      movie_ongoing
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  const [result] = await dbPool.execute(SQLQuery);
+  const values = [body.id_genre, body.movie_title, body.movie_subtitle, body.movie_year, body.movie_classification, body.movie_producer, body.movie_cast, body.movie_image, body.movie_duration, body.movie_rating, body.movie_ongoing];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
   return result;
 };
 
-const createBulkMovies = async (body) => {
+const createNewBulkMovies = async (body) => {
   if (!Array.isArray(body)) {
     throw new Error('Input must be an array');
   }
@@ -57,10 +71,46 @@ const createBulkMovies = async (body) => {
   return result;
 };
 
-const updateMovie = async (body, id) => {
-  const SQLQuery = `UPDATE movies SET id_genre='${body.id_genre}', movie_title='${body.movie_title}', movie_subtitle='${body.movie_subtitle}', movie_year=${body.movie_year}, movie_classification='${body.movie_classification}', movie_producer='${body.movie_producer}', movie_cast='${body.movie_cast}', movie_image='${body.movie_image}', movie_duration='${body.movie_duration}', movie_rating='${body.movie_rating}', movie_ongoing='${body.movie_ongoing}' WHERE id_movie=${id}`;
+const updateMovieAll = async (body, id) => {
+  const SQLQuery = `
+    UPDATE movies SET
+      id_genre = ?,
+      movie_title = ?,
+      movie_subtitle = ?,
+      movie_year = ?,
+      movie_classification = ?,
+      movie_producer = ?,
+      movie_cast = ?,
+      movie_image = ?,
+      movie_duration = ?,
+      movie_rating = ?,
+      movie_ongoing = ?
+    WHERE id_movie = ?
+  `;
 
-  const [result] = await dbPool.execute(SQLQuery);
+  const values = [body.id_genre, body.movie_title, body.movie_subtitle, body.movie_year, body.movie_classification, body.movie_producer, body.movie_cast, body.movie_image, body.movie_duration, body.movie_rating, body.movie_ongoing, id];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
+  return result;
+};
+
+const updateMoviePartial = async (body, id) => {
+  // get key and value from body
+  const fields = Object.keys(body);
+  const values = Object.values(body);
+
+  // map set query from fields
+  const setQuery = fields.map((field) => `${field} = ?`).join(', ');
+
+  const SQLQuery = `
+    UPDATE movies
+    SET ${setQuery}
+    WHERE id_movie = ?
+  `;
+
+  const params = [...values, id];
+
+  const [result] = await dbPool.execute(SQLQuery, params);
   return result;
 };
 
@@ -75,4 +125,4 @@ const deleteMovieById = async (id) => {
   return result;
 };
 
-export const MoviesModel = { getAllMovie, getMovieById, createNewMovie, createBulkMovies, updateMovie, deleteAllMovie, deleteMovieById };
+export const MoviesModel = { getAllMovie, getMovieById, createNewMovie, createNewBulkMovies, updateMovieAll, updateMoviePartial, deleteAllMovie, deleteMovieById };

@@ -13,14 +13,54 @@ const getPacketById = async (id) => {
 };
 
 const createNewPacket = async (body) => {
-  const SQLQuery = `INSERT INTO packets(packet_name, packet_status) VALUES('${body.packet_name}', '${body.packet_status}')`;
-  const [result] = await dbPool.execute(SQLQuery);
+  const SQLQuery = `INSERT INTO packets(packet_name, packet_status) VALUES(?, ?)`;
+
+  const values = [body.packet_name, body.packet_status];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
   return result;
 };
 
-const updatePacket = async (body, id) => {
-  const SQLQuery = `UPDATE packets SET packet_name='${body.packet_name}', packet_status='${body.packet_status}' WHERE id_packet=${id}}`;
-  const [result] = await dbPool.execute(SQLQuery);
+const createNewBulkPacket = async (body) => {
+  if (!Array.isArray(body)) {
+    throw new Error('Input must be an array');
+  }
+
+  const values = body.map((item) => [item.packet_name, item.packet_status]);
+
+  // single placeholder for bulk insert on nested array
+  const SQLQuery = `INSERT INTO packets(packet_name, packet_status) VALUES ?)`;
+
+  const [result] = await dbPool.query(SQLQuery, [values]);
+  return result;
+};
+
+const updatePacketAll = async (body, id) => {
+  const SQLQuery = `UPDATE packets SET packet_name=?, packet_status=? WHERE id_packet=?`;
+
+  const values = [body.packet_name, body.packet_status, id];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
+  return result;
+};
+
+const updatePacketPartial = async (body, id) => {
+  // get key and value from body
+  const fields = Object.keys(body);
+  const values = Object.values(body);
+
+  // map set query from fields
+  const setQuery = fields.map((field) => `${field} = ?`).join(', ');
+
+  const SQLQuery = `
+    UPDATE packets
+    SET ${setQuery}
+    WHERE id_packet = ?
+  `;
+
+  const params = [...values, id];
+
+  const [result] = await dbPool.execute(SQLQuery, params);
   return result;
 };
 
@@ -36,4 +76,4 @@ const deletePacketById = async (id) => {
   return result;
 };
 
-export const PacketsModel = { getAllPacket, getPacketById, createNewPacket, updatePacket, deleteAllPacket, deletePacketById };
+export const PacketsModel = { getAllPacket, getPacketById, createNewPacket, createNewBulkPacket, updatePacketAll, updatePacketPartial, deleteAllPacket, deletePacketById };

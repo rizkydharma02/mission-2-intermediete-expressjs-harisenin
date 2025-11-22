@@ -13,7 +13,10 @@ router.get('/', PacketsController.getAllPacket);
 router.get('/:id', PacketsController.getPacketById);
 
 // Update - Patch Packets Endpoint
-router.patch('/:id', PacketsController.updatePacket);
+router.patch('/:id', PacketsController.updatePacketPartial);
+
+// Update - Put Packets Endpoint
+router.put('/:id', PacketsController.updatePacketAll);
 
 // Delete - Delete All Packets Endpoint
 router.delete('/', PacketsController.deleteAllPacket);

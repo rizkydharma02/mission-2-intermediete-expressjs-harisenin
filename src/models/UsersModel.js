@@ -13,14 +13,54 @@ const getUserById = async (id) => {
 };
 
 const createNewUser = async (body) => {
-  const SQLQuery = `INSERT INTO users(username, password) VALUES('${body.username}', '${body.password}')`;
-  const [result] = await dbPool.execute(SQLQuery);
+  const SQLQuery = `INSERT INTO users(username, password) VALUES(?, ?)`;
+
+  const values = [body.username, body.password];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
   return result;
 };
 
-const updateUser = async (body, id) => {
-  const SQLQuery = `UPDATE users SET username='${body.username}', password='${body.password}' WHERE id_user=${id}`;
-  const [result] = await dbPool.execute(SQLQuery);
+const createNewBulkUser = async (body) => {
+  if (!Array.isArray(body)) {
+    throw new Error('Input must be an array');
+  }
+
+  const values = body.map((item) => [item.username, item.password]);
+
+  // single placeholder for bulk insert on nested array
+  const SQLQuery = `INSERT INTO users(username, password) VALUES ?)`;
+
+  const [result] = await dbPool.query(SQLQuery, [values]);
+  return result;
+};
+
+const updateUserAll = async (body, id) => {
+  const SQLQuery = `UPDATE users SET username=?, password=? WHERE id_user=?`;
+
+  const values = [body.username, body.password, id];
+
+  const [result] = await dbPool.execute(SQLQuery, values);
+  return result;
+};
+
+const updateUserPartial = async (body, id) => {
+  // get key and value from body
+  const fields = Object.keys(body);
+  const values = Object.values(body);
+
+  // map set query from fields
+  const setQuery = fields.map((field) => `${field} = ?`).join(', ');
+
+  const SQLQuery = `
+    UPDATE users
+    SET ${setQuery}
+    WHERE id_user = ?
+  `;
+
+  const params = [...values, id];
+
+  const [result] = await dbPool.execute(SQLQuery, params);
   return result;
 };
 
@@ -36,4 +76,4 @@ const deleteUserById = async (id) => {
   return result;
 };
 
-export const UsersModel = { getAllUser, getUserById, createNewUser, updateUser, deleteAllUser, deleteUserById };
+export const UsersModel = { getAllUser, getUserById, createNewUser, createNewBulkUser, updateUserAll, updateUserPartial, deleteAllUser, deleteUserById };
