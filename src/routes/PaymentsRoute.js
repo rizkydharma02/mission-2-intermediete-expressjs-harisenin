@@ -6,6 +6,9 @@ const router = express.Router();
 // Create - Post Payments Endpoint
 router.post('/', PaymentsController.createNewPayment);
 
+// Create - Post Bulk Payments Endpoint
+router.post('/bulk', PaymentsController.createNewBulkPayment);
+
 // Read - Get All Payments Endpoint
 router.get('/', PaymentsController.getAllPayment);
 

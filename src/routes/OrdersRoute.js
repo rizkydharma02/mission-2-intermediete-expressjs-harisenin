@@ -6,6 +6,9 @@ const router = express.Router();
 // Create - Post Orders Endpoint
 router.post('/', OrdersController.createNewOrder);
 
+// Create - Post Bulk Orders Endpoint
+router.post('/bulk', OrdersController.createNewBulkOrder);
+
 // Read - Get All Orders Endpoint
 router.get('/', OrdersController.getAllOrder);
 

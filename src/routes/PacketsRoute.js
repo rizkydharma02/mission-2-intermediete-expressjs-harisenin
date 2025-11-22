@@ -6,6 +6,9 @@ const router = express.Router();
 // Create - Post Packets Endpoint
 router.post('/', PacketsController.createNewPacket);
 
+// Create - Post Bulk Packets Endpoint
+router.post('/bulk', PacketsController.createNewBulkPacket);
+
 // Read - Get All Packets Endpoint
 router.get('/', PacketsController.getAllPacket);
 

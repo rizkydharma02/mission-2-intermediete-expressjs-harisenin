@@ -6,6 +6,9 @@ const router = express.Router();
 // Create - Post Mylist Endpoint
 router.post('/', MylistController.createNewMylist);
 
+// Create - Post Bulk Mylist Endpoint
+router.post('/bulk', MylistController.createNewBulkMylist);
+
 // Read - Get All Mylist Endpoint
 router.get('/', MylistController.getAllMylist);
 

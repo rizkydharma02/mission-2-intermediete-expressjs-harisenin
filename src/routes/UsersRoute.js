@@ -6,6 +6,9 @@ const router = express.Router();
 // Create - Post Users Endpoint
 router.post('/', UsersController.createNewUser);
 
+// Create - Post Bulk Users Endpoint
+router.post('/bulk', UsersController.createNewBulkUser);
+
 // Read - Get All Users Endpoint
 router.get('/', UsersController.getAllUser);
 

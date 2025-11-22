@@ -6,6 +6,9 @@ const router = express.Router();
 // Create - Post Genre Endpoint
 router.post('/', GenreController.createNewGenre);
 
+// Create - Post Bulk Genre Endpoint
+router.post('/bulk', GenreController.createNewBulkGenre);
+
 // Read - Get All Genre Endpoint
 router.get('/', GenreController.getAllGenre);
 
