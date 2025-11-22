@@ -19,6 +19,8 @@
 
 ## Http Method
 
+- GET All
+- GET by id
 - PATCH by id
 - PUT by id
 - POST Bulk
@@ -38,3 +40,5 @@
 - /users
 
 ### notes: use endpoint /bulk to post a lot data json
+
+- example : /movies/bulk
